@@ -46,8 +46,11 @@ ferramenta suporta — ou simplesmente peça em linguagem natural
 | Sincronizar | `openspec-sync-specs` | `/opsx:sync` | `/openspec-sync-specs` |
 | Arquivar | `openspec-archive-change` | `/opsx:archive` | `/openspec-archive-change` |
 
-Se a sua ferramenta não carrega skills, leia o `SKILL.md` correspondente em
-`.agents/skills/` e siga-o, ou use a CLI diretamente:
+Este fluxo é suportado no Claude Code: skills em `.claude/skills/`, agentes em
+`.claude/agents/`. `.agents/skills/` contém só as skills do OpenSpec para outros
+agentes, que não têm a revisão nem a TDD deste projeto.
+
+Comandos da CLI do OpenSpec:
 
 ```bash
 openspec list                         # mudanças ativas (--specs para listar specs)
@@ -61,25 +64,31 @@ openspec archive <nome>               # arquivar mudança concluída
 ### Regras
 
 - Funcionalidade nova, mudança de comportamento ou de arquitetura: comece por uma
-  proposta. Correções triviais (typo, ajuste óbvio sem mudança de comportamento)
-  podem ir direto ao código.
+  proposta.
 - Não implemente durante *explorar* nem *propor*: essas etapas produzem apenas
   artefatos de planejamento. Espere aprovação explícita antes de *aplicar*.
 - Durante *aplicar*, siga `tasks.md`; se o plano se mostrar errado, pare e
   *atualize* a mudança em vez de improvisar.
 - Rode `openspec validate <nome>` antes de pedir revisão ou arquivar.
-- Quando uma skill mencionar a etapa ou skill `code-review`, neste projeto ela é
-  a skill `review-change`.
+- A revisão deste projeto é a skill `review-change`. Não use a skill nativa
+  `code-review` nem o comando nativo `/security-review`. Os agentes `code-reviewer` e
+  `security-reviewer` só são despachados pela `review-change`. Quando uma skill citar
+  `code-review`, entenda `review-change`.
 - Toda mudança de comportamento passa por uma change do OpenSpec. Não altere
   comportamento coberto por `openspec/specs/` fora de uma change.
-- Correções que não mudam comportamento (refatoração, typo, dependência) podem ser
-  feitas sem change, mas confirme que nenhuma spec ficou desatualizada.
+- Correções que não mudam comportamento (refatoração, typo, dependência, ajuste óbvio)
+  podem ser feitas sem change, mas confirme que nenhuma spec ficou desatualizada.
 - Se o código divergir de `openspec/specs/`, não corrija nenhum dos dois em silêncio:
   registre a divergência e pergunte qual lado representa a intenção.
 - Não reescreva uma spec para legitimar um possível bug.
 - Implemente com a skill `tdd`: um teste falhando por vez, depois o código mínimo.
 - Decisão que vale só para a change vai no `design.md`; decisão que vale além dela
   vira ADR em `docs/adr/` (skill `domain-modeling`); vocabulário vai no `GLOSSARY.md`.
+- A refatoração não acontece dentro do ciclo da `tdd`: ela entra como correção de um
+  achado da `review-change`, com a autorização do humano.
+- A skill `diagnosing-bugs` serve para investigar até a causa e ter um teste que
+  reproduz o bug. A correção de um bug que altera comportamento vira uma change, mesmo
+  que pequena.
 
 ## Arquivos gerados — não edite à mão
 

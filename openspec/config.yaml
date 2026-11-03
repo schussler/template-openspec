@@ -50,6 +50,7 @@ rules:
     - Cubra o caminho feliz, os estados de falha e a recuperação de cada fluxo afetado.
     - Em MODIFIED Requirements, copie o requisito inteiro já atualizado, não só o trecho alterado.
   design:
+    - 'Crie sempre o design.md, mesmo quando as condições do template para incluí-lo não se aplicarem. Em mudanças simples, preencha de forma curta só Context, Documentação afetada, Estratégia de verificação e Superfície de segurança.'
     - 'Em Context, inclua "### Estado atual e reconciliação": para cada comportamento afetado, classifique como confirmado, mudança pretendida, divergência preexistente ou intenção a esclarecer, com evidência (arquivo:linha ou seção da spec). Proponha o tratamento das divergências que interferem na tarefa.'
     - 'Inclua "## Documentação afetada": documentos e seções fora de openspec/ que descrevem o comportamento alterado e precisarão mudar junto com o código. Escreva "Nenhuma" se não houver.'
     - 'Inclua "## Estratégia de verificação": como cada critério de aceite será comprovado (teste, verificação de contrato, execução da jornada).'
