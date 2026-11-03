@@ -19,11 +19,12 @@ Versões exatas em `template.json` → `upstreams`; licenças em `.claude/vendor
 3. Rode `openspec update` para alinhar os arquivos gerados à sua versão do OpenSpec.
 4. Apague o INSTALL.md, o UPDATE.md e o CHANGELOG.md, apague ou reescreva este README para
    o seu produto e deixe `template_only` vazio (`[]`) no `template.json`.
-5. Abra o Claude Code. A primeira change é a definição da stack: rode `/grill-with-docs` e
-   depois proponha a change. Ela preenche a Stack no `openspec/config.yaml` e os comandos em
-   `template.json` → `checks`, e liga os testes (veja "Testes por cenário").
-   Para cada tarefa, use o prompt de `docs/prompt-sessao.md`: preencha OBJETIVO, FLUXO
-   DESEJADO e CRITÉRIOS DE ACEITE e cole no chat.
+5. Abra o Claude Code. A primeira change é a definição da stack, com o prompt
+   `docs/prompts/stack.md` (antes, `/grill-with-docs` se a stack estiver em aberto). Ela
+   preenche a Stack no `openspec/config.yaml` e os comandos em `template.json` → `checks`,
+   e liga o gate no CI e o hook de pre-commit (veja "Testes por cenário").
+   Para cada tarefa, escolha o prompt em `docs/prompts/README.md`, preencha os campos
+   entre colchetes e cole no chat.
 
 ## Projeto existente
 
@@ -62,4 +63,6 @@ Cada cenário de `openspec/specs/` tem um teste cujo nome contém
   agente seguir `AGENTS.md` e `openspec/config.yaml`.
 - **Atualidade das specs**: depende de os testes rodarem sempre. O CI roda o gate de
   implementação quando `template.json` → `checks.test` estiver preenchido; a change que
-  define a stack cria também o hook de pre-commit.
+  define a stack cria também o hook de pre-commit. O que nenhuma checagem pega (teste com
+  o nome certo que verifica outra coisa, comportamento sem spec, docs fora de `openspec/`)
+  fica para a auditoria periódica, com `docs/prompts/auditoria.md`.

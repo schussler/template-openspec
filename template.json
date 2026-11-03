@@ -19,7 +19,7 @@
     ".claude/hooks/",
     ".claude/vendor/",
     "scripts/",
-    "docs/prompt-sessao.md"
+    "docs/prompts/"
   ],
   "owned": [
     "AGENTS.md",

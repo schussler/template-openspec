@@ -89,6 +89,8 @@ spec, é tipo B. Na dúvida sobre qual lado está certo, pergunte antes.
   regra escrita.
 - Cada cenário de `openspec/specs/` tem um teste cujo nome contém
   `<capability> / <nome do cenário>`. `node scripts/check-scenario-tests.mjs` confere.
+- Enquanto `template.json` → `checks.test` for `null`, recomende a change que define a
+  stack (`docs/prompts/stack.md`) antes de qualquer change de tipo B ou C.
 - A change que define a stack preenche `template.json` → `checks` (`test`, `lint`,
   `typecheck`) e cria um hook de pre-commit que roda `node scripts/gates/implement-gate.mjs`,
   `openspec validate --all --strict` e `node scripts/check-scenario-tests.mjs`. O CI roda o
