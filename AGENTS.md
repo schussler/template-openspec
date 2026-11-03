@@ -45,10 +45,23 @@ e **sincronizar** (`/opsx:sync`, aplicar deltas às specs sem arquivar).
 
 Comandos da CLI: `openspec --help`.
 
+### Antes de alterar código: classifique
+
+Para qualquer pedido que altere código, diga em uma linha, antes de começar, qual é o
+tipo, e espere o humano confirmar se houver dúvida:
+
+| Tipo | Critério | Caminho |
+|---|---|---|
+| **A** | Ninguém de fora percebe a diferença: typo, texto interno, refatoração, dependência, lint | Sem change. Rode testes e lint e confirme que nenhuma spec ficou desatualizada |
+| **B** | Muda um comportamento existente, de forma localizada | Change curta: proposal e design de poucas linhas, mesmos portões da change completa (`docs/prompts/mudanca-pequena.md`) |
+| **C** | Capacidade nova, ou mudança relevante de comportamento, arquitetura ou contratos | Change completa (`docs/prompts/sessao.md`) |
+
+Correção de bug: se a spec já descreve o comportamento correto, é tipo A, com um teste
+nomeado `<capability> / <cenário>` que reproduz o bug. Se o certo for o código e não a
+spec, é tipo B. Na dúvida sobre qual lado está certo, pergunte antes.
+
 ### Regras
 
-- Funcionalidade nova, mudança de comportamento ou de arquitetura: comece por uma
-  proposta.
 - Não implemente durante *explorar* nem *propor*: essas etapas produzem apenas
   artefatos de planejamento.
 - Só uma frase explícita do humano aprovando a implementação da versão apresentada
@@ -60,8 +73,6 @@ Comandos da CLI: `openspec --help`.
   `security-reviewer` só são despachados pela `review-change`.
 - Toda mudança de comportamento passa por uma change do OpenSpec. Não altere
   comportamento coberto por `openspec/specs/` fora de uma change.
-- Correções que não mudam comportamento (refatoração, typo, dependência, ajuste óbvio)
-  podem ser feitas sem change, mas confirme que nenhuma spec ficou desatualizada.
 - Se o código divergir de `openspec/specs/`, não corrija nenhum dos dois em silêncio:
   registre a divergência e pergunte qual lado representa a intenção.
 - Não reescreva uma spec para legitimar um possível bug.
