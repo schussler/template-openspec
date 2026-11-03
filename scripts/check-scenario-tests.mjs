@@ -3,7 +3,8 @@
 // Sem dependências. Sai com código 1 se faltar algum.
 //   node scripts/check-scenario-tests.mjs                  specs principais (openspec/specs/)
 //   node scripts/check-scenario-tests.mjs --change <nome>  cenários ADDED/MODIFIED da change
-// Os testes são procurados no repositório todo, exceto as pastas em SKIP.
+// Os testes são procurados só em arquivos de teste (ver isTestFile), fora das pastas em SKIP.
+// Autoteste: node scripts/check-scenario-tests.selftest.mjs
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
@@ -40,9 +41,18 @@ if (existsSync(specsDir)) {
 }
 if (scenarios.length === 0) { console.log(`Nenhum cenário em ${relative(root, specsDir)}/. Nada a conferir.`); process.exit(0); }
 
-// 2. Texto dos arquivos onde podem estar os testes
+// 2. Texto dos arquivos de teste: caminho com diretório test/, tests/, __tests__/ ou spec/,
+//    ou nome *.test.*, *.spec.*, *_test.* ou test_*. Arquivos .md nunca contam.
+const TEST_DIRS = new Set(["test", "tests", "__tests__", "spec"]);
+function isTestFile(p) {
+  const parts = relative(root, p).split(sep);
+  const name = parts.at(-1);
+  if (name.endsWith(".md")) return false;
+  if (parts.slice(0, -1).some((d) => TEST_DIRS.has(d))) return true;
+  return /\.(test|spec)\./.test(name) || /_test\./.test(name) || name.startsWith("test_");
+}
 let corpus = "";
-walk(root, (p) => { try { if (statSync(p).size < 1_000_000) corpus += readFileSync(p, "utf8") + "\n"; } catch {} });
+walk(root, (p) => { try { if (isTestFile(p) && statSync(p).size < 1_000_000) corpus += readFileSync(p, "utf8") + "\n"; } catch {} });
 
 // 3. Cenários sem teste
 const missing = scenarios.filter(({ capability, scenario }) => !corpus.includes(`${capability} / ${scenario}`));

@@ -2,10 +2,13 @@
 // Hook PreToolUse do Claude Code. Bloqueia o archive de uma change do OpenSpec (e a escrita
 // nas specs principais) sem review.md com "VERDICT: APPROVED" e sem verification.md.
 // exit 2 = bloqueia a ferramenta e envia o stderr ao agente.
+// O comando Bash é separado em palavras respeitando aspas e sem os corpos de heredoc: texto
+// entre aspas ou num heredoc nunca é lido como comando, mas argumentos entre aspas (como os
+// caminhos do `mv` da skill de archive) continuam sendo lidos.
 // Limitações conhecidas: barra o caminho normal da skill de archive, não um contorno
-// deliberado. Não detecta `cd` antes do `mv`, `cp -r` para archive/, nem escrita nas
-// specs pelo Bash (echo, sed, cat >). Comandos que só citam "openspec archive" num texto
-// são bloqueados por engano. Vale só no Claude Code.
+// deliberado. Não detecta `cd` antes do `mv`, `cp -r` para archive/, escrita nas specs pelo
+// Bash (echo, sed, cat >, python), nem comandos dentro de `bash -c`, `eval` ou de scripts.
+// Vale só no Claude Code; o CI (scripts/check-specs-archived.mjs) cobre os PRs.
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, resolve, relative, sep } from "node:path";
 
@@ -33,24 +36,56 @@ const activeChanges = () =>
   existsSync(changesDir)
     ? readdirSync(changesDir, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== "archive").map((d) => d.name)
     : [];
-const unquote = (s) => s.replace(/^["']|["']$/g, "");
+// Separa um comando Bash em comandos simples (listas de palavras). Remove os corpos de heredoc,
+// junta o conteúdo entre aspas à palavra em que está e divide em ; & | ( ) e quebras de linha.
+// Atribuições iniciais (VAR=valor) são descartadas, para que a primeira palavra seja o comando.
+function simpleCommands(cmd) {
+  cmd = cmd.replace(/<<-?[ \t]*(['"]?)([A-Za-z_][\w-]*)\1[^\n]*\n[\s\S]*?\n[ \t]*\2[ \t]*(?=\n|$)/g, (m) => m.slice(0, m.indexOf("\n")));
+  const cmds = [];
+  let words = [], cur = "", has = false;
+  const endWord = () => { if (has) words.push(cur); cur = ""; has = false; };
+  const endCmd = () => { endWord(); if (words.length) cmds.push(words); words = []; };
+  for (let i = 0; i < cmd.length; i++) {
+    const c = cmd[i];
+    if (c === "'") { const j = cmd.indexOf("'", i + 1); const e = j < 0 ? cmd.length : j; cur += cmd.slice(i + 1, e); has = true; i = e; }
+    else if (c === '"') { let j = i + 1; for (; j < cmd.length && cmd[j] !== '"'; j++) cur += cmd[j] === "\\" ? cmd[++j] ?? "" : cmd[j]; has = true; i = j; }
+    else if (c === "\\") { cur += cmd[++i] ?? ""; has = true; }
+    else if (c === "&" && /[<>]$/.test(cur)) { cur += c; has = true; } // 2>&1
+    else if (";&|()\n".includes(c)) endCmd();
+    else if (/\s/.test(c)) endWord();
+    else { cur += c; has = true; }
+  }
+  endCmd();
+  return cmds
+    .map((w) => { const k = w.findIndex((x) => !/^[A-Za-z_]\w*=/.test(x)); return k < 0 ? [] : w.slice(k); })
+    .filter((w) => w.length);
+}
+
+// Remove redireções (>, >>, <, <<, 2>&1) e, quando o operador vem solto, o alvo dele.
+function withoutRedirects(words) {
+  const out = [];
+  for (let i = 0; i < words.length; i++) {
+    const m = words[i].match(/^\d*(?:>>?|<<?-?)(&?)(.*)$/);
+    if (!m) out.push(words[i]);
+    else if (!m[1] && m[2] === "") i++;
+  }
+  return out;
+}
 
 const tool = input.tool_name;
 const ti = input.tool_input ?? {};
 
 if (tool === "Bash") {
-  const cmd = ti.command ?? "";
-  // 1. openspec archive <nome>
-  const cli = cmd.match(/\bopenspec\s+archive\b([^;&|]*)/);
-  if (cli) {
-    const names = cli[1].trim().split(/\s+/).map(unquote).filter((a) => a && !a.startsWith("-"));
-    if (names.length !== 1) block("Use `openspec archive <nome-da-change>` com exatamente uma change, para que review.md e verification.md possam ser conferidos.");
-    const why = notReady(names[0]); if (why) block(why);
-  }
-  // 2. mv openspec/changes/<nome> .../archive/... (é assim que a skill de archive move a change)
-  for (const m of cmd.matchAll(/\bmv\b([^;&|]*)/g)) {
-    const args = m[1].trim().split(/\s+/).map(unquote).filter((a) => a && !a.startsWith("-"));
-    if (args.length < 2 || !/(^|\/)archive(\/|$)/.test(args.at(-1))) continue;
+  for (const [name, ...rest] of simpleCommands(ti.command ?? "")) {
+    const args = withoutRedirects(rest).filter((a) => a && !a.startsWith("-"));
+    // 1. openspec archive <nome>
+    if (name === "openspec" && args[0] === "archive") {
+      const names = args.slice(1);
+      if (names.length !== 1) block("Use `openspec archive <nome-da-change>` com exatamente uma change, para que review.md e verification.md possam ser conferidos.");
+      const why = notReady(names[0]); if (why) block(why);
+    }
+    // 2. mv openspec/changes/<nome> .../archive/... (é assim que a skill de archive move a change)
+    if (name !== "mv" || args.length < 2 || !/(^|\/)archive(\/|$)/.test(args.at(-1))) continue;
     for (const src of args.slice(0, -1)) {
       const rel = relative(changesDir, resolve(input.cwd || root, src));
       if (rel && !rel.startsWith("..") && !rel.includes(sep) && rel !== "archive") {
