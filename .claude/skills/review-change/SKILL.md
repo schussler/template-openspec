@@ -25,6 +25,8 @@ Você é o coordenador da revisão. Você **não** revisa o código pessoalmente
 
 Rode `node scripts/check-scenario-tests.mjs --change <change>`. Cada cenário listado como SEM TESTE vira um achado HIGH com origem `check-scenario-tests`.
 
+Rode `node scripts/gates/implement-gate.mjs`. Cada check que falhar na tabela dele vira um achado HIGH com origem `implement-gate`. Se ele sair com 2, o veredito é BLOCKED com o motivo "checks não configurados".
+
 Despache o subagente `code-reviewer` com um prompt que contenha:
 
 - o comando exato do diff do passo 2 (ele deve rodá-lo, em vez de `git diff --staged`) e a lista de arquivos novos do passo 2, que ele deve ler inteiros;
@@ -67,7 +69,7 @@ Data: <AAAA-MM-DD> · Base: <sha curto> · Rodada: <n>
 ## Achados
 | Severidade | Origem | Arquivo:linha | Problema | Status |
 |---|---|---|---|---|
-<!-- Origem: code-reviewer | security-reviewer | check-scenario-tests. Status: aberto | corrigido | aceito pelo humano (motivo) | aceito sem motivo -->
+<!-- Origem: code-reviewer | security-reviewer | check-scenario-tests | implement-gate. Status: aberto | corrigido | aceito pelo humano (motivo) | aceito sem motivo -->
 
 ## Segurança
 <executada ou motivo para não executar; resumo>
@@ -77,7 +79,7 @@ Data: <AAAA-MM-DD> · Base: <sha curto> · Rodada: <n>
 
 Regras do veredito:
 
-- **BLOCKED** se houver qualquer achado CRITICAL ou HIGH com status "aberto".
+- **BLOCKED** se houver qualquer achado CRITICAL ou HIGH com status "aberto", ou se o `implement-gate` saiu com 2 (motivo: "checks não configurados").
 - **APPROVED** caso contrário. MEDIUM/LOW abertos ficam listados e entram em "pendências" no `verification.md`.
 - Só o humano muda um achado para "aceito pelo humano". Nunca faça isso por conta própria. Ao registrar a aceitação, se o humano não deu o motivo, pergunte uma vez e registre a resposta como "aceito pelo humano (motivo)". Se ele não quiser dar motivo, registre "aceito sem motivo".
 - Não invente achados nem rebaixe severidades. Copie a severidade atribuída pelo revisor.

@@ -9,8 +9,7 @@ Outros agentes têm só as skills do OpenSpec, em `.agents/skills/`.
 
 ## Comandos do projeto
 
-- Testes: `<preencha>`
-- Lint: `<preencha>`
+- Testes, lint e tipos: veja `template.json` → `checks`.
 - Branch principal: `main`
 
 ## Desenvolvimento orientado a specs (OpenSpec)
@@ -79,9 +78,10 @@ Comandos da CLI: `openspec --help`.
   regra escrita.
 - Cada cenário de `openspec/specs/` tem um teste cujo nome contém
   `<capability> / <nome do cenário>`. `node scripts/check-scenario-tests.mjs` confere.
-- Quando o comando de testes for definido, a mesma change acrescenta os testes ao workflow
-  `.github/workflows/openspec.yml` e cria um hook de pre-commit que roda os testes,
-  `openspec validate --all --strict` e `node scripts/check-scenario-tests.mjs`.
+- A change que define a stack preenche `template.json` → `checks` (`test`, `lint`,
+  `typecheck`) e cria um hook de pre-commit que roda `node scripts/gates/implement-gate.mjs`,
+  `openspec validate --all --strict` e `node scripts/check-scenario-tests.mjs`. O CI roda o
+  gate quando `checks.test` estiver preenchido.
 - `openspec/changes/archive/` é histórico e não é fonte de comportamento atual. O
   comportamento atual está em `openspec/specs/` e no código. Consulte o archive só para
   entender por que algo foi feito, e confirme o que encontrar contra as specs, os ADRs e

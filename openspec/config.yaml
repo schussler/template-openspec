@@ -27,7 +27,8 @@ context: |
   Leia ambos, se existirem, antes de escrever qualquer artefato, e use os termos do glossário.
 
   Stack: <preencha>
-  Comandos de teste/lint/build: <preencha>. Validação de specs e changes: openspec validate --all.
+  Comandos de teste, lint e tipos: veja template.json → checks. Build: <preencha>.
+  Validação de specs e changes: openspec validate --all.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
@@ -83,7 +84,7 @@ operations:
       - Se o escopo ou o comportamento aprovado precisar mudar, atualize os artefatos da change e PARE para pedir aprovação antes de implementar a parte afetada.
       - Atualize a documentação afetada no mesmo passo em que altera o código, nunca depois. Corrija descrições que a mudança tornou incompatíveis.
       - Mantenha os delta specs da change coerentes com o que foi realmente implementado; eles serão incorporados a openspec/specs/ no archive.
-      - Antes de executar a review-change, rode openspec validate <change> e node scripts/check-scenario-tests.mjs --change <change>, e crie os testes que faltarem.
+      - Antes de executar a review-change, rode openspec validate <change> e node scripts/check-scenario-tests.mjs --change <change>, e crie os testes que faltarem. Depois rode node scripts/gates/implement-gate.mjs, que precisa sair com 0.
       - Ao concluir as tarefas de implementação, execute a skill review-change. Não escreva o verification.md enquanto o review.md estiver BLOCKED.
       - 'Com o review.md APPROVED, escreva openspec/changes/<change>/verification.md com: o que mudou; tabela "Critério | Evidência | O que a evidência demonstra | Limitações"; tabela "Comportamento ou contrato | Documento e seção | Atualização ou conferência | Evidência"; pendências (incluindo achados MEDIUM/LOW abertos do review.md) e decisões humanas necessárias. Liste exatamente as seções conferidas; não declare um documento inteiro validado por uma revisão parcial.'
       - Não arquive. Ao final do apply, apresente o verification.md e pergunte se pode arquivar.

@@ -17,5 +17,13 @@ jobs:
       - run: openspec validate --all --strict
       - run: node scripts/check-scenario-tests.selftest.mjs
       - run: node scripts/check-scenario-tests.mjs
+      - run: node scripts/gates/implement-gate.selftest.mjs
+      - name: gate de implementação
+        run: |
+          if node -e "process.exit(require('./template.json').checks?.test ? 0 : 1)"; then
+            node scripts/gates/implement-gate.mjs
+          else
+            echo "checks não configurados: gate de implementação pulado"
+          fi
       - if: github.event_name == 'pull_request'
         run: node scripts/check-specs-archived.mjs --base "origin/${{ github.base_ref }}"

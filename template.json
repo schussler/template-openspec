@@ -1,0 +1,42 @@
+{
+  "template": { "repo": "https://github.com/schussler/template-openspec", "version": "0.2.0" },
+  "upstreams": { "openspec": "1.16.0", "ecc": "v2.2.3", "mattpocock-skills": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d" },
+  "checks": { "test": null, "lint": null, "typecheck": null },
+  "managed": [
+    ".claude/skills/review-change/",
+    ".claude/skills/ecc-security-review/",
+    ".claude/skills/grill-with-docs/",
+    ".claude/skills/grilling/",
+    ".claude/skills/domain-modeling/",
+    ".claude/skills/tdd/",
+    ".claude/skills/codebase-design/",
+    ".claude/skills/pr/",
+    ".claude/skills/diagnosing-bugs/",
+    ".claude/skills/retro/",
+    ".claude/skills/writing-for-agents/",
+    ".claude/agents/code-reviewer.md",
+    ".claude/agents/security-reviewer.md",
+    ".claude/hooks/",
+    ".claude/vendor/",
+    "scripts/",
+    "docs/prompt-sessao.md"
+  ],
+  "owned": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "openspec/config.yaml",
+    "openspec/specs/",
+    "openspec/changes/",
+    ".claude/settings.json",
+    "GLOSSARY.md",
+    "docs/adr/",
+    ".github/workflows/",
+    "template.json"
+  ],
+  "template_only": [
+    "README.md",
+    "INSTALL.md",
+    "UPDATE.md",
+    "CHANGELOG.md"
+  ]
+}
