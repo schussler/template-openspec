@@ -26,9 +26,8 @@ context: |
   Vocabulário do domínio: GLOSSARY.md. Decisões que valem além de uma change: docs/adr/.
   Leia ambos, se existirem, antes de escrever qualquer artefato, e use os termos do glossário.
 
-  Stack: ainda não definida. O repositório contém só a configuração de agentes (OpenSpec, skills,
-  AGENTS.md/CLAUDE.md); não há código-fonte nem manifesto de build (package.json, Makefile etc.).
-  Comandos de teste/lint/build: ainda não definidos. Validação de specs e changes: openspec validate --all.
+  Stack: <preencha>
+  Comandos de teste/lint/build: <preencha>. Validação de specs e changes: openspec validate --all.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.

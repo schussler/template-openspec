@@ -8,6 +8,8 @@ mude aqui.
 
 ## Comandos do projeto
 
+- Testes: `<preencha>`
+- Lint: `<preencha>`
 - Branch principal: `main`
 
 ## Desenvolvimento orientado a specs (OpenSpec)
