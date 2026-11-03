@@ -26,14 +26,18 @@ Se o OpenSpec não estiver instalado, **não instale**: peça ao humano que rode
 Levante e apresente num relatório:
 
 1. **Arquivos que já existem no ALVO**: `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`,
-   `.claude/hooks/`, `openspec/`, `scripts/check-scenario-tests.mjs`.
-2. **Colisões de nome**: para cada skill e agente da seção 3, diga se já existe uma pasta
-   ou arquivo com o mesmo nome em `.claude/skills/` ou `.claude/agents/` do ALVO.
+   `.claude/hooks/`, `openspec/`, `scripts/`, `template.json`.
+2. **Colisões de nome**: para cada caminho de `managed` no `template.json` do TEMPLATE,
+   diga se ele já existe no ALVO.
 3. **Branch principal**: `git symbolic-ref --short refs/remotes/origin/HEAD`; sem remoto,
    a branch atual. Se houver dúvida, pergunte.
 4. **Stack e comandos**: leia os manifestos e o CI (`package.json`, `pyproject.toml`,
-   `go.mod`, `Cargo.toml`, `Makefile`, `.github/workflows/` etc.) e proponha a Stack e os
-   comandos de teste, lint e build. Não invente: o que não achar, deixe como `<preencha>`.
+   `go.mod`, `Cargo.toml`, `Makefile`, `.github/workflows/` etc.) e proponha a Stack, o
+   comando de build e os comandos de teste, lint e checagem de tipos (`checks.test`,
+   `checks.lint` e `checks.typecheck` do `template.json`). Não invente: o que não achar,
+   deixe como `<preencha>` (no `template.json`, `null`). Se o projeto não tiver checador
+   de tipos, pergunte ao humano se `checks.typecheck` deve ser `false` ("não se aplica":
+   o gate pula esse check).
 5. **Ferramentas do agente**: pergunte para quais agentes rodar o `openspec init`
    (padrão: `claude`). Este fluxo completo só funciona no Claude Code.
 
@@ -44,20 +48,15 @@ Apresente também o plano de cópia e de junção da seção 3, item a item.
 
 ### Copiar (o destino não pode existir; se existir, foi listado no diagnóstico)
 
-| Do TEMPLATE | Para o ALVO |
-|---|---|
-| `.claude/skills/` `review-change`, `ecc-security-review`, `grill-with-docs`, `grilling`, `domain-modeling`, `tdd`, `codebase-design`, `pr`, `diagnosing-bugs`, `retro`, `writing-for-agents` | mesmo caminho |
-| `.claude/agents/code-reviewer.md`, `.claude/agents/security-reviewer.md` | mesmo caminho |
-| `.claude/hooks/guard-archive.mjs` | mesmo caminho |
-| `.claude/vendor/` | mesmo caminho |
-| `scripts/check-scenario-tests.mjs` | mesmo caminho |
-| `openspec/changes/archive/README.md` | mesmo caminho |
-| `docs/prompt-sessao.md` | mesmo caminho |
-| `.github/workflows/openspec.yml` | mesmo caminho (se o ALVO já tiver um workflow com esse nome, pergunte) |
+Copie para o mesmo caminho no ALVO:
+
+- cada caminho de `managed` no `template.json` do TEMPLATE;
+- `openspec/changes/archive/README.md`;
+- `.github/workflows/openspec.yml` (se o ALVO já tiver um workflow com esse nome, pergunte).
 
 **Não copie**: `.claude/skills/openspec-*`, `.claude/commands/`, `.agents/` (o
 `openspec init` gera para a versão instalada), `openspec/specs/*`, `openspec/changes/*`
-(exceto o README do archive), `README.md`, `INSTALL.md` e `.git/` do template.
+(exceto o README do archive), os arquivos de `template_only` e o `.git/` do template.
 
 ### Juntar
 
@@ -72,11 +71,19 @@ Apresente também o plano de cópia e de junção da seção 3, item a item.
 - **`openspec/config.yaml`**: se não existir, copie. Se existir, preserve `schema` e o
   `context` do ALVO e acrescente os blocos de `context`, `rules` e `operations` do
   template. Todo item de lista que contenha `": "` fica entre aspas simples.
+- **`template.json`**: se não existir, copie. Se existir, preserve os campos do ALVO e
+  acrescente os campos do template que faltarem e, em `managed` e `owned`, os caminhos do
+  template que faltarem. Nos dois casos, deixe `template_only` vazio (`[]`): ele só vale
+  no repositório do template.
 
 ### Preencher
 
-No `openspec/config.yaml` e no `AGENTS.md`: Stack, comandos e "Branch principal", com o
-que foi aprovado no diagnóstico.
+Com o que foi aprovado no diagnóstico:
+
+- `openspec/config.yaml`: Stack e Build.
+- `AGENTS.md`: "Branch principal".
+- `template.json`: `checks.test`, `checks.lint` e `checks.typecheck` (o que não foi
+  aprovado fica `null`), e `template.version` com a versão do TEMPLATE.
 
 ## 4. Inicializar o OpenSpec
 
@@ -94,10 +101,11 @@ No ALVO: `openspec init --tools <ferramentas aprovadas>`. Confirme que a saída 
    `printf '%s' '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | CLAUDE_PROJECT_DIR="$PWD" node .claude/hooks/guard-archive.mjs; echo $?`
 3. `node scripts/check-scenario-tests.mjs` roda sem erro.
 4. Referências entre skills: toda skill citada por outra está instalada.
+5. `node scripts/check-template.mjs` passa.
 
 Apague a change `install-teste`.
 
-5. Com a change `install-teste` já apagada, `openspec validate --all --strict` passa.
+6. Com a change `install-teste` já apagada, `openspec validate --all --strict` passa.
 
 ## 6. Entregar
 

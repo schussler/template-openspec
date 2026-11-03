@@ -8,19 +8,20 @@ com TDD → revisão em contexto novo → verificação → archive → PR. Func
 | Ciclo de changes e specs | OpenSpec |
 | `grill-with-docs`, `grilling`, `domain-modeling`, `tdd`, `codebase-design`, `pr`, `diagnosing-bugs`, `retro`, `writing-for-agents` | mattpocock/skills (MIT) |
 | `code-reviewer`, `security-reviewer`, `ecc-security-review` | ECC (MIT) |
-| `review-change`, hook `guard-archive`, `check-scenario-tests` | este template |
+| `review-change`, hook `guard-archive`, `check-scenario-tests`, `implement-gate`, `check-template` | este template |
 
-Versões exatas e licenças em `.claude/vendor/`.
+Versões exatas em `template.json` → `upstreams`; licenças em `.claude/vendor/`.
 
 ## Projeto novo
 
 1. Crie o repositório a partir deste template ("Use this template" no GitHub) e clone.
 2. Requisitos: Node.js 22.12+, Git e o OpenSpec (`npm install -g @fission-ai/openspec@latest`).
 3. Rode `openspec update` para alinhar os arquivos gerados à sua versão do OpenSpec.
-4. Apague este README e o INSTALL.md, ou reescreva-os para o seu produto.
+4. Apague o INSTALL.md, o UPDATE.md e o CHANGELOG.md, apague ou reescreva este README para
+   o seu produto e deixe `template_only` vazio (`[]`) no `template.json`.
 5. Abra o Claude Code. A primeira change é a definição da stack: rode `/grill-with-docs` e
-   depois proponha a change. Ela preenche Stack e Comandos no `openspec/config.yaml` e no
-   `AGENTS.md` e liga os testes (veja "Testes por cenário").
+   depois proponha a change. Ela preenche a Stack no `openspec/config.yaml` e os comandos em
+   `template.json` → `checks`, e liga os testes (veja "Testes por cenário").
    Para cada tarefa, use o prompt de `docs/prompt-sessao.md`: preencha OBJETIVO, FLUXO
    DESEJADO e CRITÉRIOS DE ACEITE e cole no chat.
 
@@ -33,6 +34,18 @@ Peça ao agente, na raiz do projeto:
 
 O agente diagnostica o projeto, mostra o plano, junta os arquivos sem sobrescrever e para
 antes do commit.
+
+## Atualizar um projeto
+
+Peça ao agente, na raiz do projeto:
+
+> Clone <url deste template> numa pasta temporária, leia o UPDATE.md e siga-o para
+> atualizar este projeto.
+
+O agente compara a versão instalada (`template.json` → `template.version`) com a nova,
+mostra o CHANGELOG e o plano, e para antes de aplicar. Arquivos de `owned` nunca são
+sobrescritos; arquivos de `managed` editados no projeto viram conflito e só mudam com a
+sua decisão.
 
 ## Testes por cenário
 
@@ -47,6 +60,6 @@ Cada cenário de `openspec/specs/` tem um teste cujo nome contém
   uma change sem `review.md` com `VERDICT: APPROVED` e `verification.md`.
 - **Instruções**: aprovação humana, TDD, revisão e atualização de docs dependem de o
   agente seguir `AGENTS.md` e `openspec/config.yaml`.
-- **Atualidade das specs**: depende de os testes rodarem sempre. Quando a stack for
-  definida, ligue testes, `openspec validate --all --strict` e o `check-scenario-tests`
-  num hook de pre-commit ou no CI.
+- **Atualidade das specs**: depende de os testes rodarem sempre. O CI roda o gate de
+  implementação quando `template.json` → `checks.test` estiver preenchido; a change que
+  define a stack cria também o hook de pre-commit.
