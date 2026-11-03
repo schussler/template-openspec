@@ -52,6 +52,8 @@ Apresente também o plano de cópia e de junção da seção 3, item a item.
 | `.claude/vendor/` | mesmo caminho |
 | `scripts/check-scenario-tests.mjs` | mesmo caminho |
 | `openspec/changes/archive/README.md` | mesmo caminho |
+| `docs/prompt-sessao.md` | mesmo caminho |
+| `.github/workflows/openspec.yml` | mesmo caminho (se o ALVO já tiver um workflow com esse nome, pergunte) |
 
 **Não copie**: `.claude/skills/openspec-*`, `.claude/commands/`, `.agents/` (o
 `openspec init` gera para a versão instalada), `openspec/specs/*`, `openspec/changes/*`

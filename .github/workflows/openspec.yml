@@ -1,0 +1,16 @@
+name: openspec
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @fission-ai/openspec@1.16.0
+      - run: openspec validate --all --strict
+      - run: node scripts/check-scenario-tests.mjs

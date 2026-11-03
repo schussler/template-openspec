@@ -21,6 +21,8 @@ Versões exatas e licenças em `.claude/vendor/`.
 5. Abra o Claude Code. A primeira change é a definição da stack: rode `/grill-with-docs` e
    depois proponha a change. Ela preenche Stack e Comandos no `openspec/config.yaml` e no
    `AGENTS.md` e liga os testes (veja "Testes por cenário").
+   Para cada tarefa, use o prompt de `docs/prompt-sessao.md`: preencha OBJETIVO, FLUXO
+   DESEJADO e CRITÉRIOS DE ACEITE e cole no chat.
 
 ## Projeto existente
 

@@ -1,10 +1,11 @@
 # AGENTS.md
 
-Instruções para **qualquer** agente de código (Claude Code, Codex, Cursor, Gemini,
-Copilot, OpenCode, Amp, Zed etc.). Este arquivo é a fonte única de verdade:
-arquivos específicos de ferramenta (como `CLAUDE.md`) apenas importam este e
-acrescentam o mínimo que é exclusivo daquela ferramenta. Ao mudar uma regra,
-mude aqui.
+Instruções para agentes de código neste repositório. Este arquivo é a fonte única de
+verdade: arquivos específicos de ferramenta (como `CLAUDE.md`) apenas importam este e
+acrescentam o mínimo que é exclusivo daquela ferramenta. Ao mudar uma regra, mude aqui.
+
+O fluxo completo (TDD, revisão em contexto novo, hook de archive) funciona no Claude Code.
+Outros agentes têm só as skills do OpenSpec, em `.agents/skills/`.
 
 ## Comandos do projeto
 
@@ -29,13 +30,19 @@ será construído.
 
 ### Fluxo
 
-1. **Explorar** (opcional) — investigar e discutir, sem escrever código.
-2. **Propor** — criar a mudança e seus artefatos de planejamento. Pare e peça revisão.
-3. **Aplicar** — implementar seguindo `tasks.md`, marcando cada tarefa ao concluí-la.
-4. **Arquivar** — mesclar os deltas em `openspec/specs/` e mover a mudança para o arquivo.
+| Fase | Como acionar | Saída | Para avançar |
+|---|---|---|---|
+| 0. Alinhar (opcional) | `/grill-with-docs` (só o humano) | `GLOSSARY.md`, `docs/adr/` | o humano confirma o entendimento |
+| 1. Explorar (opcional) | `/opsx:explore` | nada em disco | o humano pede a proposta |
+| 2. Propor | `/opsx:propose` | `proposal.md` (com CA-n), `specs/`, `design.md`, `tasks.md` | **aprovação explícita do humano** |
+| 3. Aplicar | `/opsx:apply` com a skill `tdd` | código, testes e docs afetadas | todas as tarefas de implementação marcadas |
+| 4. Revisar | skill `review-change` | `review.md` com `VERDICT:` | `VERDICT: APPROVED` |
+| 5. Verificar | grupo "Verificação" do `tasks.md` | `verification.md` | o humano pede o archive |
+| 6. Arquivar | `/opsx:archive` (protegido pelo hook) | `openspec/specs/` atualizado | — |
+| 7. PR | skill `pr` | corpo do PR | o humano confirma antes de abrir |
 
-Também existem: **atualizar** (revisar artefatos de uma mudança existente) e
-**sincronizar** (aplicar deltas às specs principais sem arquivar).
+Também existem: **atualizar** (`/opsx:update`, revisar artefatos de uma change existente)
+e **sincronizar** (`/opsx:sync`, aplicar deltas às specs sem arquivar).
 
 ### Como acionar cada etapa
 
@@ -51,10 +58,6 @@ ferramenta suporta — ou simplesmente peça em linguagem natural
 | Atualizar | `openspec-update-change` | `/opsx:update` | `/openspec-update-change` |
 | Sincronizar | `openspec-sync-specs` | `/opsx:sync` | `/openspec-sync-specs` |
 | Arquivar | `openspec-archive-change` | `/opsx:archive` | `/openspec-archive-change` |
-
-Este fluxo é suportado no Claude Code: skills em `.claude/skills/`, agentes em
-`.claude/agents/`. `.agents/skills/` contém só as skills do OpenSpec para outros
-agentes, que não têm a revisão nem a TDD deste projeto.
 
 Comandos da CLI do OpenSpec:
 
@@ -72,7 +75,11 @@ openspec archive <nome>               # arquivar mudança concluída
 - Funcionalidade nova, mudança de comportamento ou de arquitetura: comece por uma
   proposta.
 - Não implemente durante *explorar* nem *propor*: essas etapas produzem apenas
-  artefatos de planejamento. Espere aprovação explícita antes de *aplicar*.
+  artefatos de planejamento.
+- Só uma frase explícita do humano aprovando a implementação da versão apresentada
+  autoriza o *aplicar*. Silêncio, esclarecimentos, continuidade da conversa ou aprovação
+  de uma decisão isolada **não** são autorização. Se o humano pedir ajustes, atualize a
+  change e reapresente.
 - Durante *aplicar*, siga `tasks.md`; se o plano se mostrar errado, pare e
   *atualize* a mudança em vez de improvisar.
 - Rode `openspec validate <nome>` antes de pedir revisão ou arquivar.
@@ -103,9 +110,14 @@ openspec archive <nome>               # arquivar mudança concluída
   regra escrita.
 - Cada cenário de `openspec/specs/` tem um teste cujo nome contém
   `<capability> / <nome do cenário>`. `node scripts/check-scenario-tests.mjs` confere.
-- Quando o comando de testes for definido, a mesma change cria um hook de pre-commit
-  (e, havendo remoto, um job de CI) que roda os testes, `openspec validate --all --strict`
-  e `node scripts/check-scenario-tests.mjs`.
+- Quando o comando de testes for definido, a mesma change acrescenta os testes ao workflow
+  `.github/workflows/openspec.yml` e cria um hook de pre-commit que roda os testes,
+  `openspec validate --all --strict` e `node scripts/check-scenario-tests.mjs`.
+- `openspec/changes/archive/` é histórico e não é fonte de comportamento atual. O
+  comportamento atual está em `openspec/specs/` e no código. Consulte o archive só para
+  entender por que algo foi feito, e confirme o que encontrar contra as specs, os ADRs e
+  o código. Em buscas no repositório, exclua `openspec/changes/archive/`, a menos que a
+  pergunta seja histórica.
 
 ## Arquivos gerados — não edite à mão
 
