@@ -15,7 +15,7 @@ Você é o coordenador da revisão. Você **não** revisa o código pessoalmente
 
 ## 2. Delimitar o diff
 
-- Base: `git merge-base HEAD main` (ou `master`, ou a branch que o usuário indicar).
+- Base: `git merge-base HEAD <branch>`, onde `<branch>` é a "Branch principal" do AGENTS.md (ou a que o usuário indicar).
 - Escopo: `git diff <base>` (inclui alterações não commitadas) e `git diff --name-only <base>`.
 - Separe o diff em duas partes: **código** (tudo fora de `openspec/` e da documentação) e **documentação** (arquivos listados em "Documentação afetada" e qualquer outro `.md` alterado). Os artefatos em `openspec/changes/` são o contrato, não a entrega.
 - Se o diff de código estiver vazio, pare e diga que não há o que revisar.

@@ -6,6 +6,10 @@ arquivos específicos de ferramenta (como `CLAUDE.md`) apenas importam este e
 acrescentam o mínimo que é exclusivo daquela ferramenta. Ao mudar uma regra,
 mude aqui.
 
+## Comandos do projeto
+
+- Branch principal: `main`
+
 ## Desenvolvimento orientado a specs (OpenSpec)
 
 Este projeto usa [OpenSpec](https://openspec.dev/): antes de escrever código de
