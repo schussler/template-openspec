@@ -15,8 +15,9 @@ Você é o coordenador da revisão. Você **não** revisa o código pessoalmente
 
 ## 2. Delimitar o diff
 
-- Base: `git merge-base HEAD <branch>`, onde `<branch>` é a "Branch principal" do AGENTS.md (ou a que o usuário indicar).
+- Base: o pai do primeiro commit que adicionou `openspec/changes/<change>/proposal.md`. Rode `git log --diff-filter=A --format=%H -- openspec/changes/<change>/proposal.md | tail -1` para obter `<sha>`; a base é `<sha>^`. Se esse arquivo nunca foi commitado, a base é `HEAD`.
 - Escopo: `git diff <base>` (inclui alterações não commitadas) e `git diff --name-only <base>`.
+- Arquivos novos: `git ls-files -o --exclude-standard` lista os que ainda não estão no git e por isso não aparecem no `git diff`. Guarde a lista para os revisores. Não use `git add -N`.
 - Separe o diff em duas partes: **código** (tudo fora de `openspec/` e da documentação) e **documentação** (arquivos listados em "Documentação afetada" e qualquer outro `.md` alterado). Os artefatos em `openspec/changes/` são o contrato, não a entrega.
 - Se o diff de código estiver vazio, pare e diga que não há o que revisar.
 
@@ -26,7 +27,7 @@ Rode `node scripts/check-scenario-tests.mjs --change <change>`. Cada cenário li
 
 Despache o subagente `code-reviewer` com um prompt que contenha:
 
-- o comando exato do diff do passo 2 (ele deve rodá-lo, em vez de `git diff --staged`);
+- o comando exato do diff do passo 2 (ele deve rodá-lo, em vez de `git diff --staged`) e a lista de arquivos novos do passo 2, que ele deve ler inteiros;
 - o caminho da pasta `openspec/changes/<change>/`;
 - se existir `CODING_STANDARDS.md` na raiz, o caminho dele, com o pedido: **"Aplique também os padrões de `CODING_STANDARDS.md`. Cite a regra violada em cada achado que vier dele."**
 - estes pedidos adicionais, além do checklist dele:
@@ -43,7 +44,7 @@ Despache o subagente `security-reviewer`, pedindo que ele use a skill `ecc-secur
 - o diff tocar autenticação, autorização, sessões, entrada do usuário, upload, endpoints, consultas ao banco, segredos ou variáveis de ambiente, criptografia, pagamentos ou arquivos de dependências;
 - o usuário pedir.
 
-Na dúvida, rode. Passe o mesmo diff e a mesma pasta. Se não rodar, registre o motivo. Os dois revisores podem rodar em paralelo: ambos são somente leitura.
+Na dúvida, rode. Passe o mesmo diff, a mesma lista de arquivos novos e a mesma pasta. Se não rodar, registre o motivo. Os dois revisores podem rodar em paralelo: ambos são somente leitura.
 
 ## 5. Consolidar e registrar
 
@@ -66,7 +67,7 @@ Data: <AAAA-MM-DD> · Base: <sha curto> · Rodada: <n>
 ## Achados
 | Severidade | Origem | Arquivo:linha | Problema | Status |
 |---|---|---|---|---|
-<!-- Origem: code-reviewer | security-reviewer. Status: aberto | corrigido | aceito pelo humano (motivo) -->
+<!-- Origem: code-reviewer | security-reviewer | check-scenario-tests. Status: aberto | corrigido | aceito pelo humano (motivo) | aceito sem motivo -->
 
 ## Segurança
 <executada ou motivo para não executar; resumo>
@@ -78,7 +79,7 @@ Regras do veredito:
 
 - **BLOCKED** se houver qualquer achado CRITICAL ou HIGH com status "aberto".
 - **APPROVED** caso contrário. MEDIUM/LOW abertos ficam listados e entram em "pendências" no `verification.md`.
-- Só o humano muda um achado para "aceito pelo humano". Nunca faça isso por conta própria.
+- Só o humano muda um achado para "aceito pelo humano". Nunca faça isso por conta própria. Ao registrar a aceitação, se o humano não deu o motivo, pergunte uma vez e registre a resposta como "aceito pelo humano (motivo)". Se ele não quiser dar motivo, registre "aceito sem motivo".
 - Não invente achados nem rebaixe severidades. Copie a severidade atribuída pelo revisor.
 
 ## 6. Reportar
