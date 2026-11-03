@@ -1,5 +1,5 @@
 {
-  "template": { "repo": "https://github.com/schussler/template-openspec", "version": "0.2.0" },
+  "template": { "repo": "https://github.com/schussler/template-openspec", "version": "0.2.1" },
   "upstreams": { "openspec": "1.16.0", "ecc": "v2.2.3", "mattpocock-skills": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d" },
   "checks": { "test": null, "lint": null, "typecheck": null },
   "managed": [

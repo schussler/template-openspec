@@ -14,6 +14,12 @@ const args = process.argv.slice(2);
 const ci = args.indexOf("--change");
 const change = ci >= 0 ? args[ci + 1] : null;
 const specsDir = change ? join(root, "openspec", "changes", change, "specs") : join(root, "openspec", "specs");
+// Change sem delta (stack, tooling, refatoração) declara skip_specs: true no .openspec.yaml.
+const meta = change ? join(root, "openspec", "changes", change, ".openspec.yaml") : null;
+if (meta && existsSync(meta) && /^skip_specs:\s*true\s*(#.*)?$/m.test(readFileSync(meta, "utf8"))) {
+  console.log("change declara skip_specs: sem cenários a conferir");
+  process.exit(0);
+}
 if (change && !existsSync(specsDir)) { console.error(`Change sem specs: ${relative(root, specsDir)}`); process.exit(2); }
 
 function walk(dir, onFile, skip = SKIP) {

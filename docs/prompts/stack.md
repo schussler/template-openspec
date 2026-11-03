@@ -21,7 +21,9 @@ tem código, escreva "detectar do código".]
 - Se o projeto já tem código, leia os manifestos e o CI (`package.json`, `pyproject.toml`,
   `go.mod`, `Cargo.toml`, `Makefile` etc.) e proponha a stack a partir deles. Não invente
   comandos: o que não achar, pergunte.
-- Crie a change com a skill `openspec-propose`. Ela entrega:
+- Crie a change com a skill `openspec-propose`. Esta change não muda comportamento: declare
+  `skip_specs: true` no `.openspec.yaml` dela, senão o `openspec validate` falha por falta
+  de delta. Ela entrega:
   - `openspec/config.yaml` → `context`: Stack e Build;
   - `template.json` → `checks`: `test`, `lint` e `typecheck`. Use `false` só no que não se
     aplica (por exemplo, `typecheck` sem checador de tipos), com a minha confirmação;
@@ -52,6 +54,8 @@ decisões pendentes. Peça aprovação explícita e aguarde.
 - Procure, de forma literal, `<preencha>` em `AGENTS.md`, `openspec/config.yaml`,
   `README.md` e `docs/`, e preencha o que esta change definiu.
 - Confira se o README descreve como instalar, testar e rodar o projeto com a stack nova.
+- Confira se o README explica que cada clone precisa rodar
+  `git config core.hooksPath .githooks` para ativar o pre-commit.
 - Liste exatamente os documentos e as seções conferidos.
 
 ## ENTREGA

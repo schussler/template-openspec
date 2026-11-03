@@ -10,7 +10,7 @@ Antes de implementar qualquer alteração, faça a análise inicial e responda a
 
 1. O seu entendimento da demanda.
 2. A classificação, conforme "Antes de alterar código: classifique" no `AGENTS.md`:
-   - **A**: não muda comportamento (texto interno, typo, refatoração, dependência, lint). Sem change.
+   - **A**: não muda comportamento (texto interno, typo, refatoração, dependência, lint). Sem change. Se for uma refatoração grande ou arriscada, recomende uma change com `skip_specs: true` para passar pela review-change.
    - **B**: muda um comportamento existente, de forma localizada. Change curta do OpenSpec, com proposal e design de poucas linhas.
    - **C**: capacidade nova ou mudança relevante. Pare e recomende `docs/prompts/sessao.md`.
 3. A sugestão de CRITÉRIOS DE ACEITE (resultados observáveis que caracterizam a conclusão).

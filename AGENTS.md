@@ -56,6 +56,10 @@ tipo, e espere o humano confirmar se houver dúvida:
 | **B** | Muda um comportamento existente, de forma localizada | Change curta: proposal e design de poucas linhas, mesmos portões da change completa (`docs/prompts/mudanca-pequena.md`) |
 | **C** | Capacidade nova, ou mudança relevante de comportamento, arquitetura ou contratos | Change completa (`docs/prompts/sessao.md`) |
 
+Refatoração grande ou arriscada, sem mudança de comportamento: continua sendo tipo A, mas
+pode passar por uma change com `skip_specs: true` no `.openspec.yaml`, para ter a
+`review-change`. Mudanças só de tooling, CI ou documentação seguem o mesmo caminho.
+
 Correção de bug: se a spec já descreve o comportamento correto, é tipo A, com um teste
 nomeado `<capability> / <cenário>` que reproduz o bug. Se o certo for o código e não a
 spec, é tipo B. Na dúvida sobre qual lado está certo, pergunte antes.

@@ -107,6 +107,22 @@ test("--change com ADDED e REMOVED: só o ADDED é cobrado", () => {
   assert.equal(com.code, 0);
 });
 
+test("--change com skip_specs: true e sem specs/: sai com 0", () => {
+  const { code, out } = run(repo({
+    "openspec/changes/stack/.openspec.yaml": "schema: spec-driven\ncreated: 2026-11-03\nskip_specs: true\n",
+    "openspec/changes/stack/proposal.md": "## Why\n",
+  }), "--change", "stack");
+  assert.equal(code, 0, out);
+  assert.match(out, /change declara skip_specs: sem cenários a conferir/);
+});
+
+test("--change sem skip_specs e sem specs/: continua saindo com 2", () => {
+  const { code } = run(repo({
+    "openspec/changes/stack/.openspec.yaml": "schema: spec-driven\nskip_specs: false\n",
+  }), "--change", "stack");
+  assert.equal(code, 2);
+});
+
 test("change inexistente: sai com 2", () => {
   const { code, out } = run(repo({ "package.json": "{}" }), "--change", "nao-existe");
   assert.equal(code, 2);

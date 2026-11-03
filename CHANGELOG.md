@@ -3,6 +3,14 @@
 Uma seção por versão, da mais nova para a mais antiga. Cada versão corresponde à tag
 `v<versão>`. O UPDATE.md mostra as seções entre a versão instalada e a nova.
 
+## 0.2.1 — 2026-11-03
+
+### Corrigido
+
+- Changes sem delta (stack, tooling, CI, documentação, refatoração grande): declaram
+  `skip_specs: true` no `.openspec.yaml`, e o `check-scenario-tests --change` sai com 0
+  para elas. O `stack.md`, o `AGENTS.md` e o `mudanca-pequena.md` orientam quando usar.
+
 ## 0.2.0 — 2026-11-03
 
 ### Adicionado
