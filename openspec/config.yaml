@@ -56,6 +56,7 @@ rules:
     - 'Inclua "## Estratégia de verificação": como cada critério de aceite será comprovado (teste, verificação de contrato, execução da jornada).'
     - 'Inclua "## Superfície de segurança": entradas externas, autenticação/autorização, segredos, dados sensíveis e dependências novas tocadas pela mudança. Escreva "Nenhuma" se não houver.'
     - Cite os ADRs de docs/adr/ que restringem esta mudança. Se a mudança contradiz um ADR, diga isso explicitamente.
+    - 'Inclua "## Seams de teste": onde os testes vão tocar o código (interfaces, fronteiras, o que será simulado), para que sejam aprovadas junto com a change.'
   tasks:
     - Escreva as tarefas como fatias verticais testáveis, na ordem em que a skill tdd vai implementá-las.
     - Cada grupo de tarefas entrega o código, os testes e a atualização da documentação afetada pela sua parte.
@@ -77,17 +78,19 @@ operations:
   apply:
     guidance:
       - Siga as tarefas aprovadas e mantenha-se no escopo. Resolva detalhes técnicos rotineiros com autonomia.
-      - Implemente cada tarefa com a skill tdd (red-green), um teste falhando por vez. Não refatore dentro do ciclo; a refatoração fica para a revisão.
+      - Implemente cada tarefa com a skill tdd (red-green), um teste falhando por vez. Não refatore dentro do ciclo; a refatoração entra como correção de um achado da review-change, com a autorização do humano.
+      - As seams aprovadas no design.md valem como a confirmação que a skill tdd pede.
       - Se o escopo ou o comportamento aprovado precisar mudar, atualize os artefatos da change e PARE para pedir aprovação antes de implementar a parte afetada.
       - Atualize a documentação afetada no mesmo passo em que altera o código, nunca depois. Corrija descrições que a mudança tornou incompatíveis.
       - Mantenha os delta specs da change coerentes com o que foi realmente implementado; eles serão incorporados a openspec/specs/ no archive.
-      - Antes de executar a review-change, rode node scripts/check-scenario-tests.mjs --change <change> e crie os testes que faltarem.
+      - Antes de executar a review-change, rode openspec validate <change> e node scripts/check-scenario-tests.mjs --change <change>, e crie os testes que faltarem.
       - Ao concluir as tarefas de implementação, execute a skill review-change. Não escreva o verification.md enquanto o review.md estiver BLOCKED.
       - 'Com o review.md APPROVED, escreva openspec/changes/<change>/verification.md com: o que mudou; tabela "Critério | Evidência | O que a evidência demonstra | Limitações"; tabela "Comportamento ou contrato | Documento e seção | Atualização ou conferência | Evidência"; pendências (incluindo achados MEDIUM/LOW abertos do review.md) e decisões humanas necessárias. Liste exatamente as seções conferidas; não declare um documento inteiro validado por uma revisão parcial.'
       - Não arquive. Ao final do apply, apresente o verification.md e pergunte se pode arquivar.
   archive:
     guidance:
       - 'Arquive somente com pedido explícito do usuário, com review.md contendo "VERDICT: APPROVED" e com verification.md sem critérios de aceite pendentes. Se faltar algo, pare e explique.'
+      - Rode openspec validate <change> antes de arquivar.
       - Depois de incorporar os delta specs, releia as seções de openspec/specs/ alteradas e confirme que descrevem o comportamento entregue, não o planejado.
       - Rode openspec validate --specs --strict e corrija qualquer problema nas specs principais antes de encerrar.
       - Depois de incorporar os delta specs, rode node scripts/check-scenario-tests.mjs. Se algum cenário ficar sem teste, pare e avise.

@@ -44,31 +44,7 @@ será construído.
 Também existem: **atualizar** (`/opsx:update`, revisar artefatos de uma change existente)
 e **sincronizar** (`/opsx:sync`, aplicar deltas às specs sem arquivar).
 
-### Como acionar cada etapa
-
-As etapas são *skills* em formato aberto (`SKILL.md`). Use a forma que a sua
-ferramenta suporta — ou simplesmente peça em linguagem natural
-("proponha uma mudança para…", "aplique a mudança add-auth").
-
-| Etapa | Skill | Claude Code | Outros agentes (`.agents/skills`) |
-|---|---|---|---|
-| Explorar | `openspec-explore` | `/opsx:explore` | `/openspec-explore` |
-| Propor | `openspec-propose` | `/opsx:propose` | `/openspec-propose` |
-| Aplicar | `openspec-apply-change` | `/opsx:apply` | `/openspec-apply-change` |
-| Atualizar | `openspec-update-change` | `/opsx:update` | `/openspec-update-change` |
-| Sincronizar | `openspec-sync-specs` | `/opsx:sync` | `/openspec-sync-specs` |
-| Arquivar | `openspec-archive-change` | `/opsx:archive` | `/openspec-archive-change` |
-
-Comandos da CLI do OpenSpec:
-
-```bash
-openspec list                         # mudanças ativas (--specs para listar specs)
-openspec show <nome>                  # ver uma mudança ou spec
-openspec status --change <nome>       # progresso dos artefatos
-openspec instructions <artefato> --change <nome>   # instruções para gerar um artefato
-openspec validate <nome>              # validar mudança/spec
-openspec archive <nome>               # arquivar mudança concluída
-```
+Comandos da CLI: `openspec --help`.
 
 ### Regras
 
@@ -80,13 +56,9 @@ openspec archive <nome>               # arquivar mudança concluída
   autoriza o *aplicar*. Silêncio, esclarecimentos, continuidade da conversa ou aprovação
   de uma decisão isolada **não** são autorização. Se o humano pedir ajustes, atualize a
   change e reapresente.
-- Durante *aplicar*, siga `tasks.md`; se o plano se mostrar errado, pare e
-  *atualize* a mudança em vez de improvisar.
-- Rode `openspec validate <nome>` antes de pedir revisão ou arquivar.
 - A revisão deste projeto é a skill `review-change`. Não use a skill nativa
   `code-review` nem o comando nativo `/security-review`. Os agentes `code-reviewer` e
-  `security-reviewer` só são despachados pela `review-change`. Quando uma skill citar
-  `code-review`, entenda `review-change`.
+  `security-reviewer` só são despachados pela `review-change`.
 - Toda mudança de comportamento passa por uma change do OpenSpec. Não altere
   comportamento coberto por `openspec/specs/` fora de uma change.
 - Correções que não mudam comportamento (refatoração, typo, dependência, ajuste óbvio)
@@ -94,11 +66,8 @@ openspec archive <nome>               # arquivar mudança concluída
 - Se o código divergir de `openspec/specs/`, não corrija nenhum dos dois em silêncio:
   registre a divergência e pergunte qual lado representa a intenção.
 - Não reescreva uma spec para legitimar um possível bug.
-- Implemente com a skill `tdd`: um teste falhando por vez, depois o código mínimo.
 - Decisão que vale só para a change vai no `design.md`; decisão que vale além dela
   vira ADR em `docs/adr/` (skill `domain-modeling`); vocabulário vai no `GLOSSARY.md`.
-- A refatoração não acontece dentro do ciclo da `tdd`: ela entra como correção de um
-  achado da `review-change`, com a autorização do humano.
 - A skill `diagnosing-bugs` serve para investigar até a causa e ter um teste que
   reproduz o bug. A correção de um bug que altera comportamento vira uma change, mesmo
   que pequena.
