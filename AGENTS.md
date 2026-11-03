@@ -70,6 +70,16 @@ openspec archive <nome>               # arquivar mudança concluída
 - Rode `openspec validate <nome>` antes de pedir revisão ou arquivar.
 - Quando uma skill mencionar a etapa ou skill `code-review`, neste projeto ela é
   a skill `review-change`.
+- Toda mudança de comportamento passa por uma change do OpenSpec. Não altere
+  comportamento coberto por `openspec/specs/` fora de uma change.
+- Correções que não mudam comportamento (refatoração, typo, dependência) podem ser
+  feitas sem change, mas confirme que nenhuma spec ficou desatualizada.
+- Se o código divergir de `openspec/specs/`, não corrija nenhum dos dois em silêncio:
+  registre a divergência e pergunte qual lado representa a intenção.
+- Não reescreva uma spec para legitimar um possível bug.
+- Implemente com a skill `tdd`: um teste falhando por vez, depois o código mínimo.
+- Decisão que vale só para a change vai no `design.md`; decisão que vale além dela
+  vira ADR em `docs/adr/` (skill `domain-modeling`); vocabulário vai no `GLOSSARY.md`.
 
 ## Arquivos gerados — não edite à mão
 

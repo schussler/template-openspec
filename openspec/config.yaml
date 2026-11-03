@@ -8,6 +8,27 @@ schema: spec-driven
 #   context: |
 #     Designs and tasks must cover Windows, macOS, and Linux
 #     Write all artifacts in Spanish
+context: |
+  Idioma: escreva os artefatos em português do Brasil. Mantenha em inglês apenas as palavras-chave
+  que o validador do OpenSpec reconhece: SHALL/MUST nos requisitos e GIVEN/WHEN/THEN nos cenários.
+  Ex.: "O sistema SHALL bloquear a conta após 5 tentativas." / "- **WHEN** o usuário erra a senha".
+
+  Princípios: solução simples, consistente com a arquitetura existente e fácil de manter.
+  Não crie abstrações para necessidades hipotéticas.
+
+  Fonte da verdade: openspec/specs/ descreve o comportamento ENTREGUE do sistema. O código não é
+  prova de intenção; requisitos aprovados e decisões registradas são. Nunca reescreva uma spec para
+  legitimar um possível bug.
+
+  Documentação fora do OpenSpec (README, docs/, contratos de API etc.): cada contrato tem uma única
+  fonte canônica. Prefira referências a cópias.
+
+  Vocabulário do domínio: GLOSSARY.md. Decisões que valem além de uma change: docs/adr/.
+  Leia ambos, se existirem, antes de escrever qualquer artefato, e use os termos do glossário.
+
+  Stack: ainda não definida. O repositório contém só a configuração de agentes (OpenSpec, skills,
+  AGENTS.md/CLAUDE.md); não há código-fonte nem manifesto de build (package.json, Makefile etc.).
+  Comandos de teste/lint/build: ainda não definidos. Validação de specs e changes: openspec validate --all.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
@@ -18,6 +39,26 @@ schema: spec-driven
 #       - Always state what is out of scope
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - 'Além das seções do template, inclua "## Critérios de aceite": lista numerada (CA-1, CA-2...) de resultados observáveis, incluindo estados de falha e recuperação. Cada critério cita o requisito e o cenário que o cobrem (ex.: "CA-2 → auth / Recuperação de senha / Link expirado").'
+    - 'Inclua "## Fora do escopo" com os limites explícitos e "## Decisões pendentes", separando o que é proposta do agente do que já foi decidido pelo humano. Para decisões de produto, apresente opções, consequências e recomendação.'
+    - Registre problemas relevantes encontrados fora do escopo em Impact, sem ampliar o trabalho.
+    - Use os termos do GLOSSARY.md. Se precisar de um termo novo, sinalize-o em vez de inventá-lo.
+  specs:
+    - Todo critério de aceite da proposta é coberto por pelo menos um cenário. Nenhum cenário fica sem critério correspondente.
+    - Cubra o caminho feliz, os estados de falha e a recuperação de cada fluxo afetado.
+    - Em MODIFIED Requirements, copie o requisito inteiro já atualizado, não só o trecho alterado.
+  design:
+    - 'Em Context, inclua "### Estado atual e reconciliação": para cada comportamento afetado, classifique como confirmado, mudança pretendida, divergência preexistente ou intenção a esclarecer, com evidência (arquivo:linha ou seção da spec). Proponha o tratamento das divergências que interferem na tarefa.'
+    - 'Inclua "## Documentação afetada": documentos e seções fora de openspec/ que descrevem o comportamento alterado e precisarão mudar junto com o código. Escreva "Nenhuma" se não houver.'
+    - 'Inclua "## Estratégia de verificação": como cada critério de aceite será comprovado (teste, verificação de contrato, execução da jornada).'
+    - 'Inclua "## Superfície de segurança": entradas externas, autenticação/autorização, segredos, dados sensíveis e dependências novas tocadas pela mudança. Escreva "Nenhuma" se não houver.'
+    - Cite os ADRs de docs/adr/ que restringem esta mudança. Se a mudança contradiz um ADR, diga isso explicitamente.
+  tasks:
+    - Escreva as tarefas como fatias verticais testáveis, na ordem em que a skill tdd vai implementá-las.
+    - Cada grupo de tarefas entrega o código, os testes e a atualização da documentação afetada pela sua parte.
+    - 'O último grupo é "Verificação", com as tarefas, nesta ordem: "Executar a skill review-change até VERDICT: APPROVED", "Comprovar cada critério de aceite com evidência" e "Escrever verification.md na pasta da change".'
 
 # Per-operation guidance (optional)
 # Add advisory guidance for how apply and archive work should be conducted.
@@ -30,3 +71,21 @@ schema: spec-driven
 #     archive:
 #       guidance:
 #         - Summarize the archive outcome before finishing
+operations:
+  apply:
+    guidance:
+      - Siga as tarefas aprovadas e mantenha-se no escopo. Resolva detalhes técnicos rotineiros com autonomia.
+      - Implemente cada tarefa com a skill tdd (red-green), um teste falhando por vez. Não refatore dentro do ciclo; a refatoração fica para a revisão.
+      - Se o escopo ou o comportamento aprovado precisar mudar, atualize os artefatos da change e PARE para pedir aprovação antes de implementar a parte afetada.
+      - Atualize a documentação afetada no mesmo passo em que altera o código, nunca depois. Corrija descrições que a mudança tornou incompatíveis.
+      - Mantenha os delta specs da change coerentes com o que foi realmente implementado; eles serão incorporados a openspec/specs/ no archive.
+      - Ao concluir as tarefas de implementação, execute a skill review-change. Não escreva o verification.md enquanto o review.md estiver BLOCKED.
+      - 'Com o review.md APPROVED, escreva openspec/changes/<change>/verification.md com: o que mudou; tabela "Critério | Evidência | O que a evidência demonstra | Limitações"; tabela "Comportamento ou contrato | Documento e seção | Atualização ou conferência | Evidência"; pendências (incluindo achados MEDIUM/LOW abertos do review.md) e decisões humanas necessárias. Liste exatamente as seções conferidas; não declare um documento inteiro validado por uma revisão parcial.'
+      - Não arquive. Ao final do apply, apresente o verification.md e pergunte se pode arquivar.
+  archive:
+    guidance:
+      - 'Arquive somente com pedido explícito do usuário, com review.md contendo "VERDICT: APPROVED" e com verification.md sem critérios de aceite pendentes. Se faltar algo, pare e explique.'
+      - Depois de incorporar os delta specs, releia as seções de openspec/specs/ alteradas e confirme que descrevem o comportamento entregue, não o planejado.
+      - Rode openspec validate --specs --strict e corrija qualquer problema nas specs principais antes de encerrar.
+      - Depois de arquivar, ofereça escrever o corpo do PR com a skill pr, usando o review.md e o verification.md arquivados como evidência.
+      - Nunca abra, publique ou atualize um PR (por exemplo com gh pr create) sem confirmação explícita do usuário no chat.
