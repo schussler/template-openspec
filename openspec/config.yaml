@@ -49,6 +49,7 @@ rules:
     - Todo critério de aceite da proposta é coberto por pelo menos um cenário. Nenhum cenário fica sem critério correspondente.
     - Cubra o caminho feliz, os estados de falha e a recuperação de cada fluxo afetado.
     - Em MODIFIED Requirements, copie o requisito inteiro já atualizado, não só o trecho alterado.
+    - Nomes de cenário são únicos dentro da capability, curtos e estáveis. Renomear um cenário exige renomear o teste correspondente.
   design:
     - 'Crie sempre o design.md, mesmo quando as condições do template para incluí-lo não se aplicarem. Em mudanças simples, preencha de forma curta só Context, Documentação afetada, Estratégia de verificação e Superfície de segurança.'
     - 'Em Context, inclua "### Estado atual e reconciliação": para cada comportamento afetado, classifique como confirmado, mudança pretendida, divergência preexistente ou intenção a esclarecer, com evidência (arquivo:linha ou seção da spec). Proponha o tratamento das divergências que interferem na tarefa.'
@@ -59,6 +60,7 @@ rules:
   tasks:
     - Escreva as tarefas como fatias verticais testáveis, na ordem em que a skill tdd vai implementá-las.
     - Cada grupo de tarefas entrega o código, os testes e a atualização da documentação afetada pela sua parte.
+    - 'Cada cenário tem um teste cujo nome contém "<capability> / <nome do cenário>", por exemplo "invites / Código expirado".'
     - 'O último grupo é "Verificação", com as tarefas, nesta ordem: "Executar a skill review-change até VERDICT: APPROVED", "Comprovar cada critério de aceite com evidência" e "Escrever verification.md na pasta da change".'
 
 # Per-operation guidance (optional)
@@ -80,6 +82,7 @@ operations:
       - Se o escopo ou o comportamento aprovado precisar mudar, atualize os artefatos da change e PARE para pedir aprovação antes de implementar a parte afetada.
       - Atualize a documentação afetada no mesmo passo em que altera o código, nunca depois. Corrija descrições que a mudança tornou incompatíveis.
       - Mantenha os delta specs da change coerentes com o que foi realmente implementado; eles serão incorporados a openspec/specs/ no archive.
+      - Antes de executar a review-change, rode node scripts/check-scenario-tests.mjs --change <change> e crie os testes que faltarem.
       - Ao concluir as tarefas de implementação, execute a skill review-change. Não escreva o verification.md enquanto o review.md estiver BLOCKED.
       - 'Com o review.md APPROVED, escreva openspec/changes/<change>/verification.md com: o que mudou; tabela "Critério | Evidência | O que a evidência demonstra | Limitações"; tabela "Comportamento ou contrato | Documento e seção | Atualização ou conferência | Evidência"; pendências (incluindo achados MEDIUM/LOW abertos do review.md) e decisões humanas necessárias. Liste exatamente as seções conferidas; não declare um documento inteiro validado por uma revisão parcial.'
       - Não arquive. Ao final do apply, apresente o verification.md e pergunte se pode arquivar.
@@ -88,5 +91,6 @@ operations:
       - 'Arquive somente com pedido explícito do usuário, com review.md contendo "VERDICT: APPROVED" e com verification.md sem critérios de aceite pendentes. Se faltar algo, pare e explique.'
       - Depois de incorporar os delta specs, releia as seções de openspec/specs/ alteradas e confirme que descrevem o comportamento entregue, não o planejado.
       - Rode openspec validate --specs --strict e corrija qualquer problema nas specs principais antes de encerrar.
+      - Depois de incorporar os delta specs, rode node scripts/check-scenario-tests.mjs. Se algum cenário ficar sem teste, pare e avise.
       - Depois de arquivar, ofereça escrever o corpo do PR com a skill pr, usando o review.md e o verification.md arquivados como evidência.
       - Nunca abra, publique ou atualize um PR (por exemplo com gh pr create) sem confirmação explícita do usuário no chat.

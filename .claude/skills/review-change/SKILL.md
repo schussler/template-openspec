@@ -22,6 +22,8 @@ Você é o coordenador da revisão. Você **não** revisa o código pessoalmente
 
 ## 3. Revisão de código (sempre)
 
+Rode `node scripts/check-scenario-tests.mjs --change <change>`. Cada cenário listado como SEM TESTE vira um achado HIGH com origem `check-scenario-tests`.
+
 Despache o subagente `code-reviewer` com um prompt que contenha:
 
 - o comando exato do diff do passo 2 (ele deve rodá-lo, em vez de `git diff --staged`);

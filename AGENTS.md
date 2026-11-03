@@ -95,6 +95,11 @@ openspec archive <nome>               # arquivar mudança concluída
 - Padrões de código que dependem de julgamento ficam em `CODING_STANDARDS.md`, lido na
   revisão. Padrões mecânicos viram checagem automática (lint, teste, hook ou CI), não
   regra escrita.
+- Cada cenário de `openspec/specs/` tem um teste cujo nome contém
+  `<capability> / <nome do cenário>`. `node scripts/check-scenario-tests.mjs` confere.
+- Quando o comando de testes for definido, a mesma change cria um hook de pre-commit
+  (e, havendo remoto, um job de CI) que roda os testes, `openspec validate --all --strict`
+  e `node scripts/check-scenario-tests.mjs`.
 
 ## Arquivos gerados — não edite à mão
 
