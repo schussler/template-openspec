@@ -89,6 +89,12 @@ openspec archive <nome>               # arquivar mudança concluída
 - A skill `diagnosing-bugs` serve para investigar até a causa e ter um teste que
   reproduz o bug. A correção de um bug que altera comportamento vira uma change, mesmo
   que pequena.
+- A skill `retro` só é chamada pelo humano, com `/retro`. As sugestões que o humano
+  aceitar mudam a configuração do agente, não o comportamento do produto: aplique-as
+  num commit `chore:` separado, sem abrir change do OpenSpec.
+- Padrões de código que dependem de julgamento ficam em `CODING_STANDARDS.md`, lido na
+  revisão. Padrões mecânicos viram checagem automática (lint, teste, hook ou CI), não
+  regra escrita.
 
 ## Arquivos gerados — não edite à mão
 

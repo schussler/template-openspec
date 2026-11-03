@@ -26,6 +26,7 @@ Despache o subagente `code-reviewer` com um prompt que contenha:
 
 - o comando exato do diff do passo 2 (ele deve rodá-lo, em vez de `git diff --staged`);
 - o caminho da pasta `openspec/changes/<change>/`;
+- se existir `CODING_STANDARDS.md` na raiz, o caminho dele, com o pedido: **"Aplique também os padrões de `CODING_STANDARDS.md`. Cite a regra violada em cada achado que vier dele."**
 - estes pedidos adicionais, além do checklist dele:
   1. **"Para cada critério de aceite (CA-n) da proposta e cada cenário em `specs/`, diga se está implementado e se há teste que o comprove. Marque como HIGH qualquer critério ou cenário sem implementação e como MEDIUM qualquer um sem teste."**
   2. **"Liste como HIGH qualquer comportamento implementado que esteja em 'Fora do escopo' e como MEDIUM qualquer comportamento implementado que não esteja em nenhuma spec."**
