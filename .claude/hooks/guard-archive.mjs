@@ -8,6 +8,7 @@
 // Limitações conhecidas: barra o caminho normal da skill de archive, não um contorno
 // deliberado. Não detecta `cd` antes do `mv`, `cp -r` para archive/, escrita nas specs pelo
 // Bash (echo, sed, cat >, python), nem comandos dentro de `bash -c`, `eval` ou de scripts.
+// Não detecta `git -C <dir> mv`.
 // Vale só no Claude Code; o CI (scripts/check-specs-archived.mjs) cobre os PRs.
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, resolve, relative, sep } from "node:path";
@@ -76,7 +77,17 @@ const tool = input.tool_name;
 const ti = input.tool_input ?? {};
 
 if (tool === "Bash") {
-  for (const [name, ...rest] of simpleCommands(ti.command ?? "")) {
+  // Tira prefixos que só repassam o comando (sudo, env, npx...), o caminho do executável
+  // (/usr/bin/mv → mv) e trata `git mv` como `mv`.
+  const WRAPPERS = new Set(["sudo", "env", "command", "exec", "nohup", "time", "npx", "pnpm", "yarn", "bunx", "pnpx"]);
+  const normalize = (w) => {
+    w = [...w];
+    while (w.length && (WRAPPERS.has(w[0].split("/").at(-1)) || /^-/.test(w[0]) || /^[A-Za-z_]\w*=/.test(w[0]))) w.shift();
+    if (w.length) w[0] = w[0].split("/").at(-1);
+    if (w[0] === "git" && w[1] === "mv") w.shift();
+    return w;
+  };
+  for (const [name, ...rest] of simpleCommands(ti.command ?? "").map(normalize).filter((w) => w.length)) {
     const args = withoutRedirects(rest).filter((a) => a && !a.startsWith("-"));
     // 1. openspec archive <nome>
     if (name === "openspec" && args[0] === "archive") {

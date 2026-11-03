@@ -16,6 +16,7 @@ jobs:
       - run: npm install -g @fission-ai/openspec@1.16.0
       - run: openspec validate --all --strict
       - run: node scripts/check-scenario-tests.selftest.mjs
+      - run: node .claude/hooks/guard-archive.selftest.mjs
       - run: node scripts/check-scenario-tests.mjs
       - run: node scripts/gates/implement-gate.selftest.mjs
       - run: node scripts/check-template.selftest.mjs

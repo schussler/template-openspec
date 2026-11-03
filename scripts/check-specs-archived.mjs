@@ -28,7 +28,9 @@ const added = new Set(
   changes.filter(({ status, path }) => status === "A" && path.startsWith(ARCHIVE) && path.slice(ARCHIVE.length).includes("/"))
     .map(({ path }) => path.slice(ARCHIVE.length).split("/")[0])
 );
-const existedAtBase = (dir) => { try { git("cat-file", "-e", `${mergeBase}:${ARCHIVE}${dir}`); return true; } catch { return false; } };
+// Variante sem stderr: o cat-file de uma pasta nova escreveria "fatal: path ... exists on disk".
+const gitQuiet = (...a) => execFileSync("git", a, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+const existedAtBase = (dir) => { try { gitQuiet("cat-file", "-e", `${mergeBase}:${ARCHIVE}${dir}`); return true; } catch { return false; } };
 
 const problems = [];
 let ok = false;
